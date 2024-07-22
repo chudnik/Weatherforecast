@@ -1,45 +1,57 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import requests
 from datetime import datetime
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    city = 'Moscow'
-    url = f'https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&lang=ru&appid=79d1ca96933b0328e1c7e3e7a26cb347'
+    city = 'Moscow'  # По умолчанию Москва
+    temperature = None
+    temperature_feels = None
+    wind_speed = None
+    sunrise_time = None
+    sunset_time = None
+    cloudiness = None
+    coord_lon = None
+    coord_lat = None
+    weather_data = None
 
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        weather_data = response.json()
+    if request.method == 'POST':
+        city = request.form['city']
+        url = f'https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&lang=ru&appid=79d1ca96933b0328e1c7e3e7a26cb347'
 
-        temperature = weather_data['main']['temp']
-        temperature_feels = weather_data['main']['feels_like']
-        wind_speed = weather_data['wind']['speed']
-        sunrise = weather_data['sys']['sunrise']
-        sunset = weather_data['sys']['sunset']
-        cloudiness = weather_data['clouds']['all']
-        coord_lon = weather_data['coord']['lon']
-        coord_lat = weather_data['coord']['lat']
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            weather_data = response.json()
 
-        sunrise_time = datetime.fromtimestamp(sunrise).strftime('%H:%M:%S')
-        sunset_time = datetime.fromtimestamp(sunset).strftime('%H:%M:%S')
+            temperature = weather_data['main']['temp']
+            temperature_feels = weather_data['main']['feels_like']
+            wind_speed = weather_data['wind']['speed']
+            sunrise = weather_data['sys']['sunrise']
+            sunset = weather_data['sys']['sunset']
+            cloudiness = weather_data['clouds']['all']
+            coord_lon = weather_data['coord']['lon']
+            coord_lat = weather_data['coord']['lat']
 
-        return render_template('index.html', city=city, temperature=temperature, temperature_feels=temperature_feels,
-                               wind_speed=wind_speed, sunrise_time=sunrise_time, sunset_time=sunset_time,
-                               cloudiness=cloudiness, coord_lon=coord_lon, coord_lat=coord_lat)
+            sunrise_time = datetime.fromtimestamp(sunrise).strftime('%H:%M:%S')
+            sunset_time = datetime.fromtimestamp(sunset).strftime('%H:%M:%S')
 
-    except requests.exceptions.HTTPError as errh:
-        return render_template('index.html', error=f"HTTP Error: {errh}")
-    except requests.exceptions.ConnectionError as errc:
-        return render_template('index.html', error=f"Error Connecting: {errc}")
-    except requests.exceptions.Timeout as errt:
-        return render_template('index.html', error=f"Timeout Error: {errt}")
-    except requests.exceptions.RequestException as err:
-        return render_template('index.html', error=f"Error: {err}")
-    except KeyError as ke:
-        return render_template('index.html', error=f"Key Error: {ke}")
+        except requests.exceptions.HTTPError as errh:
+            return render_template('index.html', error=f"HTTP Error: {errh}")
+        except requests.exceptions.ConnectionError as errc:
+            return render_template('index.html', error=f"Error Connecting: {errc}")
+        except requests.exceptions.Timeout as errt:
+            return render_template('index.html', error=f"Timeout Error: {errt}")
+        except requests.exceptions.RequestException as err:
+            return render_template('index.html', error=f"Error: {err}")
+        except KeyError as ke:
+            return render_template('index.html', error=f"Key Error: {ke}")
+
+    return render_template('index.html', city=city, temperature=temperature, temperature_feels=temperature_feels,
+                           wind_speed=wind_speed, sunrise_time=sunrise_time, sunset_time=sunset_time,
+                           cloudiness=cloudiness, coord_lon=coord_lon, coord_lat=coord_lat, weather_data=weather_data)
 
 if __name__ == '__main__':
     app.run(debug=True)

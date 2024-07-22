@@ -5,42 +5,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #0937b3;
+            color: #fff;
         }
 
         .weather-container {
-            background-color: #fff;
+            background-color: #058be3;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
+
+        .weather-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background-color: #fff04a;
+            border-color: #fff04a;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            color: #000;
+            background-color: #fffb74;
+            border-color: #fffb74;
+        }
     </style>
 </head>
 
 <body>
-    <div class="weather-container">
-        <h1>Current Weather in {{ city }}</h1>
-        {% if error %}
-        <p>{{ error }}</p>
-        {% else %}
-        <p>Temperature: {{ temperature }} °C</p>
-        <p>Feels like: {{ temperature_feels }} °C</p>
-        <p>Wind Speed: {{ wind_speed }} m/s</p>
-        <p>Sunrise: {{ sunrise_time }}</p>
-        <p>Sunset: {{ sunset_time }}</p>
-        <p>Cloudiness: {{ cloudiness }}%</p>
-        <p>Coordinates: {{ coord_lon }}, {{ coord_lat }}</p>
-        {% endif %}
+    <div class="container">
+        <div class="weather-container">
+            <h1>Weather App</h1>
+            <form action="/" method="post" class="mb-3">
+                <div class="input-group">
+                    <input type="text" name="city" placeholder="Enter city name" required class="form-control">
+                    <button type="submit" class="btn btn-primary">Get Weather</button>
+                </div>
+            </form>
+            {% if error %}
+            <p>{{ error }}</p>
+            {% else %}
+            <h2>Current Weather in {{ city }}</h2>
+            <div class="weather-icon">
+                {% if 'Clear' in weather_data['weather'][0]['main'] %}
+                <i class="fas fa-sun"></i>
+                {% elif 'Cloud' in weather_data['weather'][0]['main'] %}
+                <i class="fas fa-cloud"></i>
+                {% elif 'Rain' in weather_data['weather'][0]['main'] %}
+                <i class="fas fa-cloud-rain"></i>
+                {% elif 'Snow' in weather_data['weather'][0]['main'] %}
+                <i class="fas fa-snowflake"></i>
+                {% else %}
+                <i class="fas fa-question-circle"></i>
+                {% endif %}
+            </div>
+            <p><i class="fas fa-thermometer-half"></i> Temperature: {{ temperature }} °C</p>
+            <p><i class="fas fa-thermometer-half"></i> Feels like: {{ temperature_feels }} °C</p>
+            <p><i class="fas fa-wind"></i> Wind Speed: {{ wind_speed }} m/s</p>
+            <p><i class="fas fa-sun"></i> Sunrise: {{ sunrise_time }}</p>
+            <p><i class="fas fa-moon"></i> Sunset: {{ sunset_time }}</p>
+            <p><i class="fas fa-cloud"></i> Cloudiness: {{ cloudiness }}%</p>
+            <p><i class="fas fa-map-marker-alt"></i> Coordinates: {{ coord_lon }}, {{ coord_lat }}</p>
+            {% endif %}
+        </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
