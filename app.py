@@ -10,6 +10,7 @@ def index():
     temperature = None
     temperature_feels = None
     wind_speed = None
+    wind_direction = None
     sunrise_time = None
     sunset_time = None
     cloudiness = None
@@ -29,6 +30,7 @@ def index():
             temperature = weather_data['main']['temp']
             temperature_feels = weather_data['main']['feels_like']
             wind_speed = weather_data['wind']['speed']
+            wind_direction = weather_data['wind']['deg']
             sunrise = weather_data['sys']['sunrise']
             sunset = weather_data['sys']['sunset']
             cloudiness = weather_data['clouds']['all']
@@ -37,6 +39,10 @@ def index():
 
             sunrise_time = datetime.fromtimestamp(sunrise).strftime('%H:%M:%S')
             sunset_time = datetime.fromtimestamp(sunset).strftime('%H:%M:%S')
+
+            # Преобразование направления ветра в текстовое описание
+            directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+            wind_direction = directions[wind_direction // 45]
 
         except requests.exceptions.HTTPError as errh:
             return render_template('index.html', error=f"HTTP Error: {errh}")
@@ -50,7 +56,7 @@ def index():
             return render_template('index.html', error=f"Key Error: {ke}")
 
     return render_template('index.html', city=city, temperature=temperature, temperature_feels=temperature_feels,
-                           wind_speed=wind_speed, sunrise_time=sunrise_time, sunset_time=sunset_time,
+                           wind_speed=wind_speed, wind_direction=wind_direction, sunrise_time=sunrise_time, sunset_time=sunset_time,
                            cloudiness=cloudiness, coord_lon=coord_lon, coord_lat=coord_lat, weather_data=weather_data)
 
 if __name__ == '__main__':
